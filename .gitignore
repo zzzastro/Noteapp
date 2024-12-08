@@ -1,0 +1,19 @@
+# Python files
+*.pyc
+__pycache__/
+
+# Virtual environment
+venv/
+
+# Django Database
+db.sqlite3
+
+# Node modules
+node_modules/
+
+# Static files
+theme/static/css/dist/
+theme/static_src/.gitignore
+
+# Compiled files
+*.log

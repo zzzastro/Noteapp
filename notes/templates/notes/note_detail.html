@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ note.title }}</title>
+    <link href="{% static 'css/dist/styles.css' %}" rel="stylesheet">
+    <style>
+        /* Styling for buttons */
+        .button {
+            display: inline-block;
+            padding: 0.5rem 1.25rem; /* Smaller padding */
+            font-size: 0.875rem; /* Tailwind's text-sm */
+            font-weight: bold;
+            text-align: center;
+            color: white;
+            background-color: #2563eb; /* Tailwind's blue-500 */
+            border-radius: 0.375rem; /* Tailwind's rounded-md */
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        .button:hover {
+            background-color: #1d4ed8; /* Tailwind's blue-700 */
+        }
+
+        .button-secondary {
+            background-color: #d1d5db; /* Tailwind's gray-300 */
+            color: #374151; /* Tailwind's gray-700 */
+        }
+
+        .button-secondary:hover {
+            background-color: #9ca3af; /* Tailwind's gray-400 */
+        }
+
+        /* Styling to preserve newlines and formatting */
+        .note-content {
+            white-space: pre-wrap; /* Ensures newlines are preserved */
+            word-wrap: break-word; /* Handles long words that don't fit */
+            margin-bottom: 1.5rem;
+            margin-top: 1rem;
+            padding-left: 1rem; /* Ensure padding on left */
+        }
+
+        /* Styling for the delete container */
+        .delete-container {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+        }
+
+        .delete-icon {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            display: block; /* Ensures image stays aligned */
+        }
+
+        /* Right-aligned text for created and updated dates */
+        .details-container {
+            text-align: right;
+            font-size: 0.875rem; /* Tailwind's text-sm */
+            color: #374151; /* Tailwind's gray-700 */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center py-10">
+    <!-- Main Container with fixed size, centered -->
+    <div class="bg-white shadow-md rounded-lg p-8 max-w-2xl w-full mx-auto my-8 relative">
+        <!-- Delete Icon -->
+        <div class="delete-container">
+            <img 
+                src="{% static 'icons/delete-icon.png' %}" 
+                alt="Delete" 
+                class="delete-icon"
+                title="Delete Note"
+                onclick="if(confirm('Are you sure you want to delete this note?')) window.location.href='{% url 'delete_note' pk=note.pk %}'"
+            />
+        </div>
+
+        <!-- Title -->
+        <h1 class="text-2xl font-bold text-center text-gray-800">{{ note.title }}</h1>
+        
+        <!-- Content -->
+        <div class="note-content text-xl font-bold text-gray-700 border border-black border-opacity-100 rounded-lg py-2 px-3 mt-2 mb-2">{{ note.content|striptags }}</div>
+        
+        <!-- Created and Updated Dates -->
+        <div class="details-container">
+            <p><strong>Created at:</strong> {{ note.created_at_local }}</p>
+            <p><strong>Last Updated:</strong> {{ note.updated_at_local }}</p>
+        </div>
+
+        <!-- Button Container -->
+        <div class="mt-6 flex justify-between"> <!-- Flex container for buttons at left and right -->
+            <!-- Back to Notes Button -->
+            <a href="{% url 'note_list' %}" class="button button-secondary">
+                Back to Notes
+            </a>
+            <!-- Edit Button -->
+            <a href="{% url 'edit_note' pk=note.pk %}" class="button">
+                Edit Note
+            </a>
+        </div>
+    </div>
+</body>
+</html>

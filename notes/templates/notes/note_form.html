@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ form.instance.title|default:"Create/Edit Note" }}</title>
+    <link href="{% static 'css/dist/styles.css' %}" rel="stylesheet">
+    <style>
+        input[type="text"],
+        textarea {
+            border: none;
+            outline: none;
+        }
+
+        input[type="text"]::placeholder,
+        textarea::placeholder {
+            opacity: 0.7;
+        }
+
+        input[type="text"]:focus,
+        textarea:focus {
+            outline: none;
+            box-shadow: none;
+        }
+
+        /* Title field limited to the container width */
+        input[type="text"] {
+            max-width: 100%;  /* Ensure it doesn't stretch beyond the container */
+            text-overflow: ellipsis; /* Truncate title if too long */
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        /* Ensure the content field wraps properly */
+        textarea {
+            width: 100%;
+            white-space: pre-wrap; /* Wrap long text in the textarea */
+            overflow-wrap: break-word; /* Break words to fit content */
+        }
+
+        /* Styling for buttons */
+        .button {
+            display: inline-block;
+            padding: 0.5rem 1.25rem; /* Smaller padding */
+            font-size: 0.875rem; /* Tailwind's text-sm */
+            font-weight: bold;
+            text-align: center;
+            color: white;
+            background-color: #2563eb; /* Tailwind's blue-500 */
+            border-radius: 0.375rem; /* Tailwind's rounded-md */
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        .button:hover {
+            background-color: #1d4ed8; /* Tailwind's blue-700 */
+        }
+
+        .button-secondary {
+            background-color: #d1d5db; /* Tailwind's gray-300 */
+            color: #374151; /* Tailwind's gray-700 */
+        }
+
+        .button-secondary:hover {
+            background-color: #9ca3af; /* Tailwind's gray-400 */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+    <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            <div class="border border-gray-300 rounded-lg overflow-hidden bg-gray-50 focus-within:ring-2 focus-within:ring-blue-500">
+                <!-- Title Field -->
+                <input
+                    type="text"
+                    name="title"
+                    id="title"
+                    class="w-full px-4 py-3 bg-transparent"
+                    placeholder="Title"
+                    value="{{ form.instance.title|default:'' }}"
+                    maxlength="35"
+                    oninput="this.value = this.value.toUpperCase();">
+        
+                <!-- Note Content Field -->
+                <textarea
+                    name="content"
+                    id="content"
+                    rows="6"
+                    class="w-full px-4 py-3 bg-transparent resize-none"
+                    placeholder="Take a note...">{{ form.instance.content|default:'' }}</textarea>
+            </div>
+        
+            <!-- Hidden input to hold the 'next' URL -->
+            <input type="hidden" name="next" value="{{ request.META.HTTP_REFERER }}" />
+        
+            <!-- Buttons Section -->
+            <div class="mt-6 flex justify-between items-center space-x-4">
+                <a href="{% url 'note_list' %}" class="button button-secondary">
+                    Back to Notes
+                </a>
+                <button type="submit" class="button">
+                    Save
+                </button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
