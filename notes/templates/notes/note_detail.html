@@ -6,101 +6,85 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ note.title }}</title>
     <link href="{% static 'css/dist/styles.css' %}" rel="stylesheet">
-    <style>
-        /* Styling for buttons */
-        .button {
-            display: inline-block;
-            padding: 0.5rem 1.25rem; /* Smaller padding */
-            font-size: 0.875rem; /* Tailwind's text-sm */
-            font-weight: bold;
-            text-align: center;
-            color: white;
-            background-color: #2563eb; /* Tailwind's blue-500 */
-            border-radius: 0.375rem; /* Tailwind's rounded-md */
-            transition: background-color 0.2s ease-in-out;
-        }
-
-        .button:hover {
-            background-color: #1d4ed8; /* Tailwind's blue-700 */
-        }
-
-        .button-secondary {
-            background-color: #d1d5db; /* Tailwind's gray-300 */
-            color: #374151; /* Tailwind's gray-700 */
-        }
-
-        .button-secondary:hover {
-            background-color: #9ca3af; /* Tailwind's gray-400 */
-        }
-
-        /* Styling to preserve newlines and formatting */
-        .note-content {
-            white-space: pre-wrap; /* Ensures newlines are preserved */
-            word-wrap: break-word; /* Handles long words that don't fit */
-            margin-bottom: 1.5rem;
-            margin-top: 1rem;
-            padding-left: 1rem; /* Ensure padding on left */
-        }
-
-        /* Styling for the delete container */
-        .delete-container {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-        }
-
-        .delete-icon {
-            width: 24px;
-            height: 24px;
-            cursor: pointer;
-            display: block; /* Ensures image stays aligned */
-        }
-
-        /* Right-aligned text for created and updated dates */
-        .details-container {
-            text-align: right;
-            font-size: 0.875rem; /* Tailwind's text-sm */
-            color: #374151; /* Tailwind's gray-700 */
-        }
-    </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex items-center justify-center py-10">
-    <!-- Main Container with fixed size, centered -->
-    <div class="bg-white shadow-md rounded-lg p-8 max-w-2xl w-full mx-auto my-8 relative">
-        <!-- Delete Icon -->
-        <div class="delete-container">
-            <img 
-                src="{% static 'icons/delete-icon.png' %}" 
-                alt="Delete" 
-                class="delete-icon"
-                title="Delete Note"
-                onclick="if(confirm('Are you sure you want to delete this note?')) window.location.href='{% url 'delete_note' pk=note.pk %}'"
-            />
-        </div>
+    {% block content %}
+    <div class="w-full sm:w-10/12 md:w-2/3 lg:w-1/2 xl:w-5/12 mx-auto px-4 py-8">
+        <!-- Note Container with Border -->
+        <div class="relative border border-gray-500 border-opacity-80 p-4 rounded flex flex-col max-h-[90vh]">
+            <!-- Toast Notification -->
+            <div id="toast" class="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-4 py-2 rounded-lg opacity-0 transition-opacity duration-200 pointer-events-none z-[9999]">
+                {% if messages %}
+                    {% for message in messages %}
+                        {{ message }}
+                    {% endfor %}
+                {% else %}
+                    Copied to clipboard!
+                {% endif %}
+            </div>
 
-        <!-- Title -->
-        <h1 class="text-2xl font-bold text-center text-gray-800">{{ note.title }}</h1>
-        
-        <!-- Content -->
-        <div class="note-content text-xl font-bold text-gray-700 border border-black border-opacity-100 rounded-lg py-2 px-3 mt-2 mb-2">{{ note.content|striptags }}</div>
-        
-        <!-- Created and Updated Dates -->
-        <div class="details-container">
-            <p><strong>Created at:</strong> {{ note.created_at_local }}</p>
-            <p><strong>Last Updated:</strong> {{ note.updated_at_local }}</p>
-        </div>
+            <!-- Fixed Header -->
+            <div class="sticky top-0 flex justify-between items-center bg-gray-100 pb-4">
+                <h2 class="text-xl font-bold">{{ note.title }}</h2>
+                <div class="flex gap-4 items-center">
+                    <button onclick="copyToClipboard()" class="bg-gray-200 px-3 py-1.5 rounded hover:bg-gray-300">
+                        <span class="text-sm italic">Copy</span>
+                    </button>
+                    <div class="w-[22px]">
+                        <img 
+                            src="{% static 'icons/delete-icon.png' %}" 
+                            alt="Delete" 
+                            class="cursor-pointer"
+                            width="22" height="22"
+                            title="Delete Note"
+                            onclick="if(confirm('Are you sure you want to delete this note?')) window.location.href='{% url 'delete_note' pk=note.pk %}'"
+                        />
+                    </div>
+                </div>
+            </div>
+            <script>
+                // Show toast if there are messages
+                document.addEventListener('DOMContentLoaded', function() {
+                    {% if messages %}
+                        const toast = document.getElementById('toast');
+                        toast.classList.remove('opacity-0');
+                        toast.classList.add('bg-blue-500'); 
+                        setTimeout(() => {
+                            toast.classList.add('opacity-0');
+                        }, 2000);
+                    {% endif %}
+                });
+            </script>
+            <!-- Scrollable Content Area -->
+            <div class="flex-1 overflow-y-auto">
+                <div class="note-content whitespace-pre-wrap break-words">{{ note.content }}</div>
+            </div>
 
-        <!-- Button Container -->
-        <div class="mt-6 flex justify-between"> <!-- Flex container for buttons at left and right -->
-            <!-- Back to Notes Button -->
-            <a href="{% url 'note_list' %}" class="button button-secondary">
-                Back to Notes
-            </a>
-            <!-- Edit Button -->
-            <a href="{% url 'edit_note' pk=note.pk %}" class="button">
-                Edit Note
-            </a>
+            <!-- Fixed Footer -->
+            <div class="sticky bottom-0 bg-gray-100 pt-4 z-10">
+                <!-- Category and Dates -->
+                <div class="details-container text-sm text-gray-700 flex justify-between items-center mb-4">
+                    <span class="bg-gray-200 px-4 py-2 rounded text-center">
+                        <strong>{{ note.category.name|default:"Uncategorized" }}</strong>
+                    </span>
+                    <div class="text-right">
+                        <p><strong>Created at:</strong> {{ note.created_at|date:"M d, Y h:i:s A" }}</p>
+                        <p><strong>Last Updated:</strong> {{ note.updated_at|date:"M d, Y h:i:s A" }}</p>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex justify-between">
+                    <a href="{% url 'note_list' %}" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
+                        Back to Notes
+                    </a>
+                    <a href="{% url 'edit_note' pk=note.pk %}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                        Edit Note
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
+    {% endblock %}
 </body>
 </html>

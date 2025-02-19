@@ -1,116 +1,84 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    {% load static %}
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Note List</title>
-    <link href="{% static 'css/dist/styles.css' %}" rel="stylesheet" />
-    <style>
-        /* Custom circular shadow effect for buttons */
-        .custom-shadow {
-            box-shadow: none; /* No shadow by default */
-            transition: box-shadow 0.1s ease-in-out; /* Remove delay for smoother transition */
-            padding: 3px; /* Padding to make the circle larger */
-            border-radius: 50%; /* Ensures it's a perfect circle */
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-            width: 58px; /* Set a fixed width */
-            height: 58px; /* Set a fixed height */
-            text-align: center;
-            font-size: 1rem; /* Adjust font size to fit */
-        }
+{% extends "base.html" %}
+{% load static %}  <!-- load the static tag -->
+{% load static custom_filters %}  <!-- load custom_filters: notes\templatetags\custom_filters.py -->
 
-        .custom-shadow:hover {
-            box-shadow: 0 1px 20px rgba(100, 100, 100, 0.2); /* Softer shadow on hover with blended edges */
-        }
-
-        /* Edit button styling */
-        .edit-button {
-            color: #d97706; /* Tailwind's amber-600 for yellow text */
-            text-decoration: none;
-        }
-
-        .edit-button:hover {
-            color: #b45309; /* Tailwind's amber-700 for darker yellow text */
-        }
-
-        /* Button icon style */
-        .button-icon {
-            width: 24px; /* Adjust icon size */
-            height: 24px;
-            cursor: pointer;
-        }
-
-        .flex-between {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        /* Adjusting the list container */
-        .container {
-            width: 40%; /* Increased width of the container (adjust this value as needed) */
-            max-width: 900px; /* Maximum width to avoid it becoming too wide */
-            padding: 16px; /* Space inside the container */
-            margin: 0 auto; /* Center the container horizontally */
-        }
-    </style>
-</head>
-<body class="bg-gray-100 min-h-screen flex items-center justify-center">
-    <div class="container mx-auto">
-        <h1 class="text-3xl font-bold text-center mb-6">Notes</h1>
-        <ul class="bg-white shadow-md rounded-lg divide-y divide-gray-200">
-            {% for note in notes %}
-            <li
-                class="flex justify-between items-center p-4 hover:bg-gray-100 transition duration-200 cursor-pointer"
-                onclick="window.location.href='{% url 'note_detail' pk=note.pk %}'"
-            >
-                <!-- Note Title with hover effect -->
-                <div style="margin: 0;"> <!-- Added div to control spacing -->
-                    <label
-                        for="note-{{ note.pk }}"
-                        class="text-blue-600 cursor-pointer no-underline label-hover"
-                        onclick="window.location.href='{% url 'note_detail' pk=note.pk %}'"
-                    >
-                        {{ note.title }}
-                    </label>
-                </div>
-                <div class="flex space-x-2">
-                    <!-- Edit button -->
-                    <a 
-                        href="{% url 'edit_note' pk=note.pk %}"
-                        class="custom-shadow button-round transition duration-200 focus:outline-none edit-button"
-                        title="Edit"
-                        onclick="event.stopPropagation();">
-                        Edit
-                    </a>
-                    <!-- Delete button with icon -->
-                    <a
-                        href="{% url 'delete_note' pk=note.pk %}"
-                        class="custom-shadow button-round transition duration-200 focus:outline-none"
-                        title="Delete Note"
-                        onclick="event.stopPropagation(); return confirm('Are you sure you want to delete this note?');"
-                    >
-                        <img
-                            src="{% static 'icons/delete-icon.png' %}"
-                            alt="Delete"
-                            class="button-icon"
-                        />
-                    </a>
-                </div>
-            </li>
-            {% empty %}
-            <li class="p-4 text-gray-500 text-center">No notes available.</li>
-            {% endfor %}
-        </ul>
-        <div class="mt-6 text-center">
-            <a
-                href="{% url 'create_note' %}"
-                class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-200"
-            >Take a New Note</a>
+{% block content %}
+<div class="w-full sm:w-11/12 md:w-3/4 lg:w-7/12 xl:w-11/20 mx-auto px-4 py-8">
+    <!-- Header with Add Note and Manage Categories Buttons -->
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold">My Notes</h1>
+        <div class="flex gap-4">
+            <a href="{% url 'manage_categories' %}" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                Manage Categories
+            </a>
+            <a href="{% url 'create_note' %}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 text-center">
+                Add Note
+            </a>
         </div>
     </div>
-</body>
-</html>
+
+    <!-- Search and Filter Controls -->
+    <div class="mb-6 flex flex-wrap gap-4">
+        <!-- Search Box -->
+        <div class="flex-1">
+            <form method="GET" class="flex gap-2">
+                <input type="text" name="search" placeholder="Search notes..." 
+                       class="w-full p-2 border rounded" value="{{ request.GET.search }}">
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">
+                    Search
+                </button>
+            </form>
+        </div>
+        
+        <!-- Category Filter -->
+        <div class="flex-none">
+            <form method="GET" class="flex gap-2">
+                <select name="category" class="p-2 border rounded appearance-none bg-white" onchange="this.form.submit()">
+                    <option value="">All Categories</option>
+                    {% for category in categories %}
+                    <option value="{{ category.id }}" {% if request.GET.category == category.id|stringformat:"s" %}selected{% endif %}>
+                        {{ category.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </form>
+        </div>
+    </div>
+
+    <!-- Note List -->
+    <div class="grid gap-4 grid-cols-1">
+        {% for note in notes %}
+            <div class="relative">
+                <div class="p-4 border rounded shadow hover:shadow-lg transition-shadow cursor-pointer" onclick="window.location.href='{% url 'note_detail' pk=note.pk %}'">
+                    <h2 class="text-xl font-bold">{{ note.title }}</h2>
+                    <p class="text-sm text-gray-600 mt-2">{{ note.content|truncatewords:30 }}</p>
+                    <div class="mt-4 flex justify-between items-center">
+                        <button onclick="event.stopPropagation(); window.location.href='{% url 'edit_note' pk=note.pk %}'" class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 text-sm">
+                            Edit
+                        </button>
+                        <span class="text-sm text-gray-500">
+                            Edited: {{ note.updated_at|smart_timesince }}
+                        </span>
+                        <span class="text-sm bg-gray-200 px-2 py-1 rounded">
+                            {{ note.category.name|default:"Uncategorized" }}
+                        </span>
+                    </div>
+                </div>
+                <!-- Delete Icon -->
+                <div class="absolute top-2 right-2">
+                    <img 
+                        src="{% static 'icons/delete-icon.png' %}" 
+                        alt="Delete" 
+                        class="cursor-pointer"
+                        width="22" height="22"
+                        title="Delete Note"
+                        onclick="if(confirm('Are you sure you want to delete this note?')) window.location.href='{% url 'delete_note' pk=note.pk %}'"
+                    />
+                </div>
+            </div>
+        {% empty %}
+            <p>No notes found.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

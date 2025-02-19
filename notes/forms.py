@@ -5,11 +5,11 @@ from datetime import datetime
 class NoteForm(forms.ModelForm):
     class Meta:
         model = Note
-        fields = ['title', 'content']
+        fields = ['title', 'content', 'category']
 
     def __init__(self, *args, **kwargs):
         super(NoteForm, self).__init__(*args, **kwargs)
-        # Do not set the title by default in the __init__ method, leave it empty initially
+        # Do not set the title by default, leave it empty initially
         if not self.instance.pk and not self.instance.title:
             self.instance.title = ''  # Ensure it's empty initially
 
