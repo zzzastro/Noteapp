@@ -15,7 +15,7 @@ SECRET_KEY = 'django-insecure-&le=!k@4yn-plv-q^=#6%_%_#(b#%!*k(+9(&0^%br-mllu5al
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.1.100']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -29,8 +29,24 @@ INSTALLED_APPS = [
     'tailwind',
     'theme',
     'django_browser_reload',
+    'pwa',
 ]
 
+# PWA Configuration
+PWA_APP_NAME = 'Noteapp'
+PWA_APP_DESCRIPTION = "A modern note-taking application"
+PWA_APP_THEME_COLOR = '#000000'
+PWA_APP_BACKGROUND_COLOR = '#ffffff'
+PWA_APP_DISPLAY = 'standalone'
+PWA_APP_SCOPE = '/'
+PWA_APP_START_URL = '/'
+PWA_APP_ICONS = [
+    {
+        'src': '/static/icons/noteapp-icon.png',
+        'sizes': '64x64',
+        'type': 'image/png'
+    }
+]
 NPM_BIN_PATH = r"C:\Program Files\nodejs\npm.cmd"
 TAILWIND_APP_NAME = 'theme'
 

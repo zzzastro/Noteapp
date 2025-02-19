@@ -7,4 +7,5 @@ urlpatterns = [
     path('notes/', include('notes.urls')),
     path('', views.note_list, name='home'),  # Set the root URL to point to the note list view (Default home page)
     path("__reload__/", include("django_browser_reload.urls")),
+    path('', include('pwa.urls')),
 ]

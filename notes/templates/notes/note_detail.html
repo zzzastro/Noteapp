@@ -42,6 +42,48 @@
                     </div>
                 </div>
             </div>
+            <!-- Copy to Clipboard Functionality -->
+            <script>
+                function copyToClipboard() {
+                    const content = document.querySelector('.note-content').innerText;
+                    
+                    // Try modern clipboard API first (for PWA)
+                    if (navigator.clipboard && window.isSecureContext) {
+                        navigator.clipboard.writeText(content)
+                            .then(showToast)
+                            .catch(fallbackCopy);
+                    } else {
+                        fallbackCopy();
+                    }
+
+                    function fallbackCopy() {
+                        // Create temporary textarea
+                        const textArea = document.createElement('textarea');
+                        textArea.value = content;
+                        textArea.style.position = 'fixed';
+                        textArea.style.left = '-999999px';
+                        document.body.appendChild(textArea);
+                        
+                        try {
+                            textArea.select();
+                            document.execCommand('copy');
+                            showToast();
+                        } catch (err) {
+                            alert('Unable to copy text');
+                        } finally {
+                            document.body.removeChild(textArea);
+                        }
+                    }
+
+                    function showToast() {
+                        const toast = document.getElementById('toast');
+                        toast.classList.remove('opacity-0');
+                        setTimeout(() => {
+                            toast.classList.add('opacity-0');
+                        }, 2000);
+                    }
+                }
+            </script>
             <script>
                 // Show toast if there are messages
                 document.addEventListener('DOMContentLoaded', function() {
