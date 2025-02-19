@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="w-full sm:w-11/12 md:w-3/4 lg:w-7/12 xl:w-11/20 mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold">Manage Categories</h1>
+        <a href="{% url 'note_list' %}" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
+            Back to Notes
+        </a>
+    </div>
+    
+    <!-- Add Category Form -->
+    <form method="POST" class="mb-8">
+        {% csrf_token %}
+        <div class="flex gap-4">
+            <input type="text" name="category_name" placeholder="New category name" 
+                   class="flex-1 p-2 border rounded">
+            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded text-center">
+                Add Category
+            </button>
+        </div>
+    </form>
+
+    <!-- Categories List -->
+    <ul class="space-y-4">
+        {% for category in categories %}
+        <a href="{% url 'edit_category' category.id %}" class="block">
+            <li class="flex justify-between items-center p-4 border rounded hover:bg-gray-100">
+                <span class="text-blue-500">{{ category.name }}</span>
+                <form method="POST" action="{% url 'delete_category' category.id %}" class="inline">
+                    {% csrf_token %}
+                    <button type="submit" class="text-red-500 hover:underline text-center">
+                        Delete
+                    </button>
+                </form>
+            </li>
+        </a>
+        {% endfor %}
+    </ul>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            {% if messages %}
+                const toast = document.getElementById('toast');
+                toast.classList.remove('opacity-0');
+                toast.classList.add('bg-blue-500');  
+                setTimeout(() => {
+                    toast.classList.add('opacity-0');
+                }, 2000);
+            {% endif %}
+        });
+    </script>
+</div>
+{% endblock %}
