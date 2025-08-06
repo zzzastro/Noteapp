@@ -37,7 +37,7 @@
                             class="cursor-pointer"
                             width="22" height="22"
                             title="Delete Note"
-                            onclick="if(confirm('Are you sure you want to delete this note?')) window.location.href='{% url 'delete_note' pk=note.pk %}'"
+                            onclick="if(confirm('Are you sure you want to delete this note?')) { window.location.href='{% url 'delete_note' pk=note.pk %}'; }"
                         />
                     </div>
                 </div>
