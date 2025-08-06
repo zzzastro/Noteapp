@@ -19,6 +19,7 @@ DEBUG = False
 ALLOWED_HOSTS = [
     'zzzastro.pythonanywhere.com', 
     '.pythonanywhere.com',
+    'https://noteapp-2bfb.onrender.com',
 ]
 
 # Application definition
