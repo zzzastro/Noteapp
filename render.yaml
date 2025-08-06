@@ -4,6 +4,7 @@ services:
     env: python
     buildCommand: "./build.sh"
     startCommand: "gunicorn noteapp.wsgi:application"
+    initialDeployHook: python manage.py migrate
     envVars:
       - key: PYTHON_VERSION
         value: 3.12.0
