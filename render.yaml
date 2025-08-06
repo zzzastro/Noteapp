@@ -2,8 +2,8 @@ services:
   - type: web
     name: noteapp
     runtime: python
-    buildCommand: "./build.sh"
-    startCommand: "python manage.py migrate && python manage.py collectstatic --noinput && gunicorn noteapp.wsgi:application"
+    buildCommand: "python -m pip install --upgrade pip && pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate --noinput"
+    startCommand: "gunicorn noteapp.wsgi:application"
     envVars:
       - key: PYTHON_VERSION
         value: 3.13.0
@@ -16,7 +16,7 @@ services:
       - key: DEBUG
         value: "False"
       - key: ALLOWED_HOSTS
-        value: "noteapp-2bfb.onrender.com,localhost,127.0.0.1"
+        value: "noteapp-2bfb.onrender.com"
 
 databases:
   - name: notedb
