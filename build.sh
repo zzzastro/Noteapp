@@ -2,11 +2,7 @@
 # Exit on error
 set -o errexit
 
-# Install Python dependencies
 pip install -r requirements.txt
 
-# Collect static files
-python manage.py collectstatic --noinput
-
-# Apply database migrations
+python manage.py collectstatic --no-input
 python manage.py migrate
