@@ -1,26 +1,25 @@
 services:
   - type: web
     name: noteapp
-    env: python
+    runtime: python
     buildCommand: "./build.sh"
-    startCommand: "gunicorn noteapp.wsgi:application"
-    initialDeployHook: python manage.py migrate
+    startCommand: "python manage.py migrate && python manage.py collectstatic --noinput && gunicorn noteapp.wsgi:application"
     envVars:
       - key: PYTHON_VERSION
-        value: 3.12.0
+        value: 3.13.0
       - key: DATABASE_URL
         fromDatabase:
-          name: noteapp-db
+          name: notedb
           property: connectionString
       - key: SECRET_KEY
         generateValue: true
       - key: DEBUG
-        value: false
+        value: "False"
       - key: ALLOWED_HOSTS
-        value: ".onrender.com"
+        value: "noteapp-2bfb.onrender.com,localhost,127.0.0.1"
 
 databases:
-  - name: noteapp-db
-    databaseName: noteapp
+  - name: notedb
+    databaseName: notedb
     user: noteapp
     plan: starter
